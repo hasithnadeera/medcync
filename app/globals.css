@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Set root variables for light and dark themes */
+:root {
+  --background:rgb(255, 255, 255);
+  --foreground:rgb(255, 255, 255);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background:rgb(255, 255, 255);
+    --foreground:rgb(255, 255, 255);
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: "SF Pro Display", Arial, sans-serif;
+}
