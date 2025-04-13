@@ -3,7 +3,7 @@ import Link from 'next/link'
 import MobileMenu from './components/MobileMenu'
 import MobileMenuButton from './components/MobileMenuButton'
 import FAQSection from './components/FAQSection'
-
+import { app } from './firebase/firebaseConfig';
 export default function Home() {
   return (
     <main className="min-h-screen bg-white relative">
@@ -27,9 +27,9 @@ export default function Home() {
             <div className="flex-1 flex justify-center">
               <div className="hidden sm:flex gap-8 items-center">
                 <Link href="/" className="text-black hover:text-[#1055AE] transition-colors font-medium">Home</Link>
-                <Link href="/features" className="text-black hover:text-[#1055AE] transition-colors font-medium">Features</Link>
-                <Link href="/faq" className="text-black hover:text-[#1055AE] transition-colors font-medium">FAQ</Link>
-                <Link href="/contact" className="text-black hover:text-[#1055AE] transition-colors font-medium">Contact</Link>
+                <Link href="" className="text-black hover:text-[#1055AE] transition-colors font-medium">Features</Link>
+                <Link href="" className="text-black hover:text-[#1055AE] transition-colors font-medium">FAQ</Link>
+                <Link href="" className="text-black hover:text-[#1055AE] transition-colors font-medium">Contact</Link>
               </div>
             </div>
             <div className="flex gap-4 items-center">

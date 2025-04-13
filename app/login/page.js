@@ -44,11 +44,10 @@ export default function Login() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex justify-center items-start sm:items-center p-4 pt-0 sm:pt-4">
-        <div className="w-full max-w-6xl flex flex-col md:flex-row">
-          {/* Left side - Sign In Form */}
-          <div className="w-full md:w-2/5 bg-white p-6 md:p-8 rounded-2xl shadow-lg">
-            {/* Sign In Form */}
+      <div className="flex-1 flex justify-center items-center p-4 pt-0 sm:pt-4">
+        <div className="w-full max-w-md">
+          {/* Sign In Form */}
+          <div className="w-full bg-white p-6 md:p-8 rounded-2xl shadow-lg">
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-800 mb-1">Sign in</h1>
               <p className="text-gray-600 text-sm">Stay updated with your health</p>
@@ -58,21 +57,42 @@ export default function Login() {
               <div className="mb-6">
                 <input
                   type="tel"
-                  placeholder="Phone number"
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  id="phone"
+                  name="phone"
+                  placeholder="07XXXXXXXX"
+                  pattern="07[0-9]{8}"
+                  maxLength="10"
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-black"
                   value={phoneNumber}
-                  onChange={handlePhoneChange}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow digits and ensure starts with 07
+                    const numericValue = value.replace(/\D/g, '');
+                    if (numericValue === '' || 
+                        (numericValue.startsWith('07') && numericValue.length <= 10) ||
+                        (value.length === 1 && value === '0') ||
+                        (value.length === 2 && value === '07')) {
+                      handlePhoneChange({ target: { value: numericValue } });
+                    }
+                  }}
+                  title="Please enter a valid SL mobile number starting with 07 followed by 8 digits"
                   required
                 />
               </div>
-
               <div className="mb-6 relative">
                 <input
                   type="text"
                   placeholder="OTP number"
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  maxLength="6"
+                  pattern="[0-9]{6}"
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-black"
                   value={otpNumber}
-                  onChange={handleOtpChange}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow digits and limit to 6 characters
+                    const numericValue = value.replace(/\D/g, '').slice(0, 6);
+                    setOtpNumber(numericValue);
+                  }}
                 />
                 <button
                   type="button"
@@ -96,20 +116,6 @@ export default function Login() {
               <Link href="/signup" className="text-blue-600 font-medium hover:underline">
                 Join now
               </Link>
-            </div>
-          </div>
-
-          {/* Right side - Illustration */}
-          <div className="hidden md:block md:w-3/5 p-8">
-            <div className="h-full w-full flex items-center justify-center">
-              <Image
-                src="/signin-image.png"
-                alt="Doctor with health app illustration"
-                width={600}
-                height={500}
-                className="max-h-full object-contain mix-blend-normal"
-                priority
-              />
             </div>
           </div>
         </div>
