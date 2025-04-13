@@ -2,8 +2,12 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { supabase } from '@/app/supabaseClient';
+import { Toaster, toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 export default function SignUp() {
+  const router = useRouter(); // Initialize useRouter
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
@@ -21,14 +25,84 @@ export default function SignUp() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Here you would typically send the data to your backend
+
+    const { name, dob, phone, id, address, gender } = formData;
+
+    // Show loading toast
+    const loadingToast = toast.loading('Creating your account...');
+
+    try {
+      const { data, error } = await supabase.from('users').insert([
+        {
+          name,
+          dob: dob,
+          phone: phone,
+          id_number: id,
+          address,
+          gender,
+          role: 'patient'
+        }
+      ]);
+
+      if (error) throw error;
+
+      // Success message
+      toast.success('Account created successfully!', {
+        id: loadingToast,
+        duration: 4000,
+      });
+
+      // Clear form
+      setFormData({
+        name: '',
+        dob: '',
+        phone: '',
+        id: '',
+        address: '',
+        gender: 'male'
+      });
+
+      // Redirect to login page after a delay
+      setTimeout(() => {
+        router.push('/login');
+      }, 4000); // Delay for 4 seconds to allow the user to see the success message
+
+    } catch (error) {
+      // Error message
+      toast.error('Something went wrong. Please try again.', {
+        id: loadingToast,
+        duration: 4000,
+      });
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white">
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          success: {
+            style: {
+              background: '#10B981',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#EF4444',
+              color: 'white',
+            },
+          },
+          loading: {
+            style: {
+              background: '#1055AE',
+              color: 'white',
+            },
+          },
+        }}
+      />
       <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-white">
         <div className="mb-8">
           <Link href="/">
