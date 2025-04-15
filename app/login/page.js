@@ -3,10 +3,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast, Toaster } from 'react-hot-toast';
 
 export default function Login() {
+  const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpNumber, setOtpNumber] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const handlePhoneChange = (e) => {
     setPhoneNumber(e.target.value);
@@ -16,19 +20,86 @@ export default function Login() {
     setOtpNumber(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted with:', { phoneNumber, otpNumber });
+    if (!isVerifying) {
+      toast.error('Please verify your phone number first');
+      return;
+    }
+
+    const loadingToast = toast.loading('Verifying OTP...');
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneNumber, code: otpNumber })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Login successful!', { id: loadingToast });
+        router.push('/patientDashbaord');
+      } else {
+        toast.error(data.error || 'Invalid OTP', { id: loadingToast });
+      }
+    } catch (error) {
+      toast.error('Failed to verify OTP', { id: loadingToast });
+    }
   };
 
-  const handleSendOtp = () => {
-    // Handle OTP sending
-    console.log('Sending OTP to:', phoneNumber);
+  const handleSendOtp = async () => {
+    if (!phoneNumber.match(/^07[0-9]{8}$/)) {
+      toast.error('Please enter a valid phone number');
+      return;
+    }
+
+    const loadingToast = toast.loading('Sending OTP...');
+    try {
+      const response = await fetch('/api/auth/verify-phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneNumber })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('OTP sent successfully!', { id: loadingToast });
+        setIsVerifying(true);
+      } else {
+        toast.error(data.error || 'Failed to send OTP', { id: loadingToast });
+      }
+    } catch (error) {
+      toast.error('Failed to send OTP', { id: loadingToast });
+    }
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          success: {
+            style: {
+              background: '#10B981',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#EF4444',
+              color: 'white',
+            },
+          },
+          loading: {
+            style: {
+              background: '#1055AE',
+              color: 'white',
+            },
+          },
+        }}
+      />
       {/* Logo Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-20">
         <Link href="/">
