@@ -29,7 +29,7 @@ export default function PatientDashboard() {
         <nav className="flex-1">
           <ul className="space-y-1">
             <li>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 bg-[#0d4690] text-white">
+              <Link href="/patientDashboard" className="flex items-center gap-3 px-4 py-3 hover:bg-[#0d4690] text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
@@ -45,7 +45,7 @@ export default function PatientDashboard() {
               </Link>
             </li>
             <li>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 hover:bg-[#0d4690] text-white">
+              <Link href="/medicalRecords" className="flex items-center gap-3 px-4 py-3 hover:bg-[#0d4690] text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                 </svg>
@@ -53,7 +53,7 @@ export default function PatientDashboard() {
               </Link>
             </li>
             <li>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 hover:bg-[#0d4690] text-white">
+              <Link href="/appoinments" className="flex items-center gap-3 px-4 py-3 hover:bg-[#0d4690] text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                 </svg>
@@ -165,7 +165,7 @@ export default function PatientDashboard() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#1055AE]">Medical Records Summary</h2>
-              <Link href="#" className="text-[#1055AE] hover:text-[#0d4690] text-sm font-medium">
+              <Link href="/medicalRecords" className="text-[#1055AE] hover:text-[#0d4690] text-sm font-medium">
                 View All Records
               </Link>
             </div>
@@ -259,7 +259,7 @@ export default function PatientDashboard() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#1055AE]">Upcoming Appointments</h2>
-              <Link href="#" className="text-[#1055AE] hover:text-[#0d4690] text-sm font-medium">
+              <Link href="/appointments" className="text-[#1055AE] hover:text-[#0d4690] text-sm font-medium">
                 View All Appointments
               </Link>
             </div>
