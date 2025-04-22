@@ -39,7 +39,15 @@ export default function Login() {
 
       if (response.ok) {
         toast.success('Login successful!', { id: loadingToast });
-        router.push('/patientDashbaord');
+        const { user } = data;
+        // Route based on user role
+        if (user.role === 'doctor') {
+          router.push('/doctorDashboard');
+        } else if (user.role === 'pharmacist') {
+          router.push('/pharmacistDashboard');
+        } else {
+          router.push('/patientDashboard');
+        }
       } else {
         toast.error(data.error || 'Invalid OTP', { id: loadingToast });
       }
