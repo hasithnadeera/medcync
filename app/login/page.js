@@ -32,7 +32,7 @@ export default function Login() {
       const response = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber, code: otpNumber })
+        body: JSON.stringify({ phone: '+94' + phoneNumber, code: otpNumber })
       });
 
       const data = await response.json();
@@ -57,7 +57,7 @@ export default function Login() {
   };
 
   const handleSendOtp = async () => {
-    if (!phoneNumber.match(/^07[0-9]{8}$/)) {
+    if (!phoneNumber.match(/^7[0-9]{8}$/)) {
       toast.error('Please enter a valid phone number');
       return;
     }
@@ -67,7 +67,7 @@ export default function Login() {
       const response = await fetch('/api/auth/verify-phone', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber })
+        body: JSON.stringify({ phone: '+94' + phoneNumber })
       });
 
       const data = await response.json();
@@ -75,6 +75,8 @@ export default function Login() {
       if (response.ok) {
         toast.success('OTP sent successfully!', { id: loadingToast });
         setIsVerifying(true);
+      } else if (response.status === 404) {
+        toast.error('Phone number not registered. Please sign up first.', { id: loadingToast });
       } else {
         toast.error(data.error || 'Failed to send OTP', { id: loadingToast });
       }
@@ -111,11 +113,11 @@ export default function Login() {
       {/* Logo Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-20">
         <Link href="/">
-          <Image 
-            src="/logo.svg" 
-            alt="MedSync Logo" 
-            width={165} 
-            height={55.44} 
+          <Image
+            src="/logo.svg"
+            alt="MedSync Logo"
+            width={165}
+            height={55.44}
             priority
             className="object-contain"
           />
@@ -134,60 +136,65 @@ export default function Login() {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  placeholder="07XXXXXXXX"
-                  pattern="07[0-9]{8}"
-                  maxLength="10"
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-black"
-                  value={phoneNumber}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow digits and ensure starts with 07
-                    const numericValue = value.replace(/\D/g, '');
-                    if (numericValue === '' || 
-                        (numericValue.startsWith('07') && numericValue.length <= 10) ||
-                        (value.length === 1 && value === '0') ||
-                        (value.length === 2 && value === '07')) {
-                      handlePhoneChange({ target: { value: numericValue } });
-                    }
-                  }}
-                  title="Please enter a valid SL mobile number starting with 07 followed by 8 digits"
-                  required
-                />
-              </div>
-              <div className="mb-6 relative">
-                <input
-                  type="text"
-                  placeholder="OTP number"
-                  maxLength="6"
-                  pattern="[0-9]{6}"
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-black"
-                  value={otpNumber}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow digits and limit to 6 characters
-                    const numericValue = value.replace(/\D/g, '').slice(0, 6);
-                    setOtpNumber(numericValue);
-                  }}
-                />
+                <div className="mb-6">
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">+94</span>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      placeholder="7XXXXXXXX"
+                      pattern="7[0-9]{8}"
+                      maxLength="9"
+                      className="w-full p-4 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-black"
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow digits and ensure starts with 7
+                        const numericValue = value.replace(/\D/g, '');
+                        if (
+                          numericValue === '' ||
+                          (numericValue.startsWith('7') && numericValue.length <= 9)
+                        ) {
+                          handlePhoneChange({ target: { value: numericValue } });
+                        }
+                      }}
+                      title="Please enter a valid SL mobile number starting with 7 followed by 8 digits"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="mb-6 relative">
+                  <input
+                    type="text"
+                    placeholder="OTP number"
+                    maxLength="6"
+                    pattern="[0-9]{6}"
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-black"
+                    value={otpNumber}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Only allow digits and limit to 6 characters
+                      const numericValue = value.replace(/\D/g, '').slice(0, 6);
+                      setOtpNumber(numericValue);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600 font-medium"
+                    onClick={handleSendOtp}
+                  >
+                    Send
+                  </button>
+                </div>
+
                 <button
-                  type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600 font-medium"
-                  onClick={handleSendOtp}
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-4 rounded-lg font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
                 >
-                  Send
+                  Sign in
                 </button>
               </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-4 rounded-lg font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
-              >
-                Sign in
-              </button>
             </form>
 
             <div className="mt-6 text-center">
@@ -200,5 +207,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+
   );
 }

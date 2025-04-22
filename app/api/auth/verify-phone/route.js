@@ -27,20 +27,33 @@ export async function POST(request) {
     const { phone } = await request.json();
     console.log('Received phone number:', phone);
 
-    // Ensure phone number is in correct format (07XXXXXXXX)
-    if (!phone.match(/^07[0-9]{8}$/)) {
+    // Normalize phone number to +94 format
+    let normalizedPhone = phone;
+    if (phone.startsWith('+94')) {
+      normalizedPhone = phone;
+    } else if (phone.startsWith('0')) {
+      normalizedPhone = '+94' + phone.substring(1);
+    } else {
       return new Response(
         JSON.stringify({ error: 'Invalid phone number format' }),
         { status: 400 }
       );
     }
 
-    // Check if phone number exists in database with more detailed logging
-    console.log('Querying database for phone number:', phone);
+    // Ensure phone number is in correct format (+94XXXXXXXXX)
+    if (!normalizedPhone.match(/^\+94[0-9]{9}$/)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid phone number format' }),
+        { status: 400 }
+      );
+    }
+
+    // Check if phone number exists in database using only +94 format
+    console.log('Querying database for phone number:', normalizedPhone);
     const { data: users, error } = await supabase
       .from('users')
       .select('*')
-      .eq('phone', phone);
+      .eq('phone', normalizedPhone);
 
     console.log('Database query result:', { users, error });
 
@@ -64,10 +77,25 @@ export async function POST(request) {
     
     if (!user) {
       // Check if the phone number exists in any format
-      const { data: allUsers, error: searchError } = await supabase
+      const alternativePhone = normalizedPhone.replace('+94', '0');
+      let { data: allUsers, error: searchError } = await supabase
         .from('users')
         .select('*')
-        .or(`phone.eq.${phone},phone.eq.${phone.trim()}`);
+        .or(`phone.eq.${normalizedPhone},phone.eq.${alternativePhone}`);
+      
+      // If there's an error with the OR syntax, try alternative approach
+      if (searchError && searchError.message && searchError.message.includes('syntax')) {
+        console.log('Trying alternative query approach for phone search');
+        const { data: altUsers, error: altError } = await supabase
+          .from('users')
+          .select('*')
+          .or(`phone.eq.${normalizedPhone},phone.eq.${alternativePhone}`.split(',').join(','));
+          
+        if (!altError) {
+          allUsers = altUsers;
+          searchError = null;
+        }
+      }
 
       if (searchError) {
         console.error('Error searching for user:', searchError);
@@ -78,7 +106,7 @@ export async function POST(request) {
       }
 
       if (!allUsers || allUsers.length === 0) {
-        console.log('No user found with phone number:', phone);
+        console.log('No user found with phone number:', normalizedPhone);
         return new Response(
           JSON.stringify({ error: 'Phone number not registered. Please sign up first.' }),
           { status: 404 }
@@ -91,7 +119,7 @@ export async function POST(request) {
         const verification = await client.verify.v2
           .services(serviceSid)
           .verifications
-          .create({ to: `+94${allUsers[0].phone.substring(1)}`, channel: 'sms' });
+          .create({ to: normalizedPhone, channel: 'sms' });
 
         return new Response(
           JSON.stringify({ status: verification.status }),
@@ -105,7 +133,7 @@ export async function POST(request) {
       const verification = await client.verify.v2
         .services(serviceSid)
         .verifications
-        .create({ to: `+94${phone.substring(1)}`, channel: 'sms' });
+        .create({ to: normalizedPhone, channel: 'sms' });
       
       console.log('Verification sent successfully:', verification.status);
       

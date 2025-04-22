@@ -4,17 +4,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '@/app/supabaseClient';
 import { Toaster, toast } from 'react-hot-toast';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter(); 
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
     phone: '',
     id: '',
     address: '',
-    gender: 'male'
+    gender: ''
   });
 
   const handleChange = (e) => {
@@ -30,6 +30,16 @@ export default function SignUp() {
 
     const { name, dob, phone, id, address, gender } = formData;
 
+    // Normalize phone number to +94 format
+    let normalizedPhone = phone.replace(/\D/g, '');
+    if (normalizedPhone.startsWith('94')) {
+      normalizedPhone = '+94' + normalizedPhone.substring(2);
+    } else if (normalizedPhone.startsWith('0')) {
+      normalizedPhone = '+94' + normalizedPhone.substring(1);
+    } else if (!normalizedPhone.startsWith('94')) {
+      normalizedPhone = '+94' + normalizedPhone;
+    }
+
     // Show loading toast
     const loadingToast = toast.loading('Creating your account...');
 
@@ -38,7 +48,7 @@ export default function SignUp() {
         {
           name,
           dob: dob,
-          phone: phone,
+          phone: normalizedPhone,
           id_number: id,
           address,
           gender,
@@ -61,7 +71,7 @@ export default function SignUp() {
         phone: '',
         id: '',
         address: '',
-        gender: 'male'
+        gender: ''
       });
 
       // Redirect to login page after a delay
@@ -151,32 +161,35 @@ export default function SignUp() {
             
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number:</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  // Only allow digits and ensure starts with 07
-                  const numericValue = value.replace(/\D/g, '');
-                  if (numericValue === '' || 
-                      (numericValue.startsWith('07') && numericValue.length <= 10) ||
-                      (value.length === 1 && value === '0') ||
-                      (value.length === 2 && value === '07')) {
-                    setFormData(prevState => ({
-                      ...prevState,
-                      phone: numericValue
-                    }));
-                  }
-                }}
-                placeholder="07XXXXXXXX"
-                maxLength="10"
-                pattern="07[0-9]{8}"
-                title="Please enter a valid SL mobile number starting with 07 followed by 8 digits"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#1055AE] focus:border-[#1055AE] text-black"
-              />
+              <div className="flex">
+                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-600 select-none">+94</span>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow digits and ensure starts with 7
+                    const numericValue = value.replace(/\D/g, '');
+                    if (
+                      numericValue === '' ||
+                      (numericValue.startsWith('7') && numericValue.length <= 9)
+                    ) {
+                      setFormData(prevState => ({
+                        ...prevState,
+                        phone: numericValue
+                      }));
+                    }
+                  }}
+                  placeholder="7XXXXXXXX"
+                  maxLength="9"
+                  pattern="7[0-9]{8}"
+                  title="Please enter a valid SL mobile number starting with 7 followed by 8 digits"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-1 focus:ring-[#1055AE] focus:border-[#1055AE] text-black"
+                />
+              </div>
             </div>
             
             <div>
@@ -225,6 +238,7 @@ export default function SignUp() {
                     value="male"
                     checked={formData.gender === 'male'}
                     onChange={handleChange}
+                    required
                     className="h-4 w-4 text-[#1055AE] focus:ring-[#1055AE] border-gray-300 accent-[#1055AE]"
                   />
                   <label htmlFor="male" className="ml-2 text-sm text-gray-700">Male</label>
@@ -237,9 +251,23 @@ export default function SignUp() {
                     value="female"
                     checked={formData.gender === 'female'}
                     onChange={handleChange}
+                    required
                     className="h-4 w-4 text-[#1055AE] focus:ring-[#1055AE] border-gray-300 accent-[#1055AE]"
                   />
                   <label htmlFor="female" className="ml-2 text-sm text-gray-700">Female</label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="other"
+                    name="gender"
+                    value="other"
+                    checked={formData.gender === 'other'}
+                    onChange={handleChange}
+                    required
+                    className="h-4 w-4 text-[#1055AE] focus:ring-[#1055AE] border-gray-300 accent-[#1055AE]"
+                  />
+                  <label htmlFor="other" className="ml-2 text-sm text-gray-700">Other</label>
                 </div>
               </div>
             </div>
